@@ -10,13 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
 import huahwei_project.quizapp.ui.theme.QuizAppTheme
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
 class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
-        fetchQuizData().start()
+
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
         super.onCreate(savedInstanceState)
         setContent {
             QuizAppTheme {
@@ -25,20 +30,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                 }
-            }
-        }
-    }
-
-    private  fun fetchQuizData():Thread{
-        return Thread(){
-            val url = URL("https://opentdb.com/api.php?amount=20")
-            val connection = url.openConnection() as HttpURLConnection
-            if(connection.responseCode == 200){
-                val inputSystem = connection.inputStream
-                println(inputSystem.toString())
-            }
-            else{
-                println("Cannot connect")
             }
         }
     }

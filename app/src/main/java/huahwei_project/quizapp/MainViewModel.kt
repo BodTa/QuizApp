@@ -16,6 +16,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val questionError = MutableLiveData<Boolean>()
 
     val question = MutableLiveData<Question>()
+
+    init {
+        getDataFromAPI()
+    }
     fun getDataFromAPI(){
         questionLoad.value = true
 
