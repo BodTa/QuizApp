@@ -73,4 +73,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
     implementation("com.github.bump tech.glide:glide:4.12.0")
+    implementation ("com.google.android.material:material:1.5.0")
+
 }

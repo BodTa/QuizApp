@@ -26,7 +26,7 @@
         android:id="@+id/profile"
         android:title="Profile"
         android:icon="@drawable/bottom_btn4"
-        app:cnb_iconColor="@color/white"
+        app:cnb_iconColor="@color/purple"
         app:cnb_backgroundColor="@color/orange"
         android:contentDescription="@string/profile"/>
 </menu>

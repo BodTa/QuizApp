@@ -377,7 +377,7 @@
         android:id="@+id/menu"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/purple"
+        android:background="@color/white"
         android:contentDescription="@string/chip_navigation_bar_description"
         app:cnb_iconSize="20dp"
         app:cnb_menuResource="@menu/bottom_menu"
