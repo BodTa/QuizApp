@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">QuizApp</string>
+    <string name="chip_navigation_bar_description">Bottom navigation bar</string>
+        <string name="home">Home</string>
+        <string name="board">Board</string>
+        <string name="favorites">Favorites</string>
+        <string name="profile">Profile</string>
+    <string name="question_nquestion">Question\nquestion</string>
+    <string name="kategoriler">Kategoriler</string>
+    <string name="hepsi">Hepsi</string>
+    <string name="bilim">Bilim</string>
+    <string name="tarih">Tarih</string>
+    <string name="spor">Spor</string>
+    <string name="sanat">Sanat</string>
+    <string name="option">option</string>
+
+
+</resources>
