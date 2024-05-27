@@ -7,35 +7,38 @@ import androidx.lifecycle.MutableLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val questionAPI = QuestionAPIService()
 
-    val questionData = MutableLiveData<List<Question>>()
-    val questionLoad = MutableLiveData<Boolean>()
-    val questionError = MutableLiveData<Boolean>()
-
-    val question = MutableLiveData<Question>()
+    val categoriesData = MutableLiveData<List<QuestionCategory>>()
+    val categoriesLoad = MutableLiveData<Boolean>()
+    val categoriesError = MutableLiveData<Boolean>()
 
     init {
-        getDataFromAPI()
+        getCategoriesFromAPI()
     }
-    fun getDataFromAPI(){
-        questionLoad.value = true
 
-        questionAPI.GetQuestions().enqueue(object: Callback<List<Question>>{
-            override fun onResponse(call: Call<List<Question>>, response: Response<List<Question>>) {
-                questionData.value = response.body()
-                questionLoad.value = false
-                questionError.value = false
+    fun getCategoriesFromAPI() {
+        categoriesLoad.value = true
+
+        questionAPI.getCategories().enqueue(object : Callback<List<QuestionCategory>> {
+            override fun onResponse(call: Call<List<QuestionCategory>>, response: Response<List<QuestionCategory>>) {
+                if (response.isSuccessful) {
+                    categoriesData.value = response.body()
+                    categoriesError.value = false
+                } else {
+                    categoriesError.value = true
+                }
+                categoriesLoad.value = false
             }
 
-            override fun onFailure(call: Call<List<Question>>, t: Throwable) {
-                questionLoad.value = false
-                questionError.value = true
-                Log.e("RetrofitError",t.message.toString())
+            override fun onFailure(call: Call<List<QuestionCategory>>, t: Throwable) {
+                categoriesLoad.value = false
+                categoriesError.value = true
+                Log.e("RetrofitError", t.message.toString())
             }
         })
-
     }
 }
