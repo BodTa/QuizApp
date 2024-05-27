@@ -5,7 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class QuestionAPIService {
-    private  val URL = "https://opentdb.com/api.php"
+    private  val URL = "https://opentdb.com/"
 
     private val api = Retrofit.Builder()
         .baseUrl(URL)
@@ -13,7 +13,11 @@ class QuestionAPIService {
         .build()
         .create(QuestionAPI::class.java)
 
-    fun GetQuestions(): Call<List<Question>>{
-        return api.GetQuestions()
+    fun getQuestions(amount: Int, categoryId: Int): Call<List<Question>> {
+        return api.GetQuestions(amount, categoryId)
+    }
+
+    fun getCategories(): Call<List<QuestionCategory>> {
+        return api.GetCategories()
     }
 }
