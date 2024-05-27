@@ -7,64 +7,78 @@ import androidx.lifecycle.MutableLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val questionAPI = QuestionAPIService()
 
-    val categoriesData = MutableLiveData<List<QuestionCategory>>()
-    val categoriesLoad = MutableLiveData<Boolean>()
-    val categoriesError = MutableLiveData<Boolean>()
+    private val _categoriesData = MutableStateFlow<List<QuestionCategory>>(emptyList())
+    val categoriesData: StateFlow<List<QuestionCategory>> = _categoriesData
 
-    val questionsData = MutableLiveData<List<Question>>()
-    val questionsLoad = MutableLiveData<Boolean>()
-    val questionsError = MutableLiveData<Boolean>()
+    private val _categoriesLoad = MutableStateFlow<Boolean>(false)
+    val categoriesLoad: StateFlow<Boolean> = _categoriesLoad
+
+    private val _categoriesError = MutableStateFlow<Boolean>(false)
+    val categoriesError: StateFlow<Boolean> = _categoriesError
+
+    private val _questionsData = MutableStateFlow<List<Question>>(emptyList())
+    val questionsData: StateFlow<List<Question>> = _questionsData
+
+    private val _questionsLoad = MutableStateFlow<Boolean>(false)
+    val questionsLoad: StateFlow<Boolean> = _questionsLoad
+
+    private val _questionsError = MutableStateFlow<Boolean>(false)
+    val questionsError: StateFlow<Boolean> = _questionsError
 
     init {
         getCategoriesFromAPI()
     }
 
     fun getCategoriesFromAPI() {
-        categoriesLoad.value = true
+        _categoriesLoad.value = true
 
         questionAPI.getCategories().enqueue(object : Callback<List<QuestionCategory>> {
             override fun onResponse(call: Call<List<QuestionCategory>>, response: Response<List<QuestionCategory>>) {
                 if (response.isSuccessful) {
-                    categoriesData.value = response.body()
-                    categoriesError.value = false
+                    _categoriesData.value = response.body() ?: emptyList()
+                    _categoriesError.value = false
                 } else {
-                    categoriesError.value = true
+                    _categoriesError.value = true
                 }
-                categoriesLoad.value = false
+                _categoriesLoad.value = false
             }
 
             override fun onFailure(call: Call<List<QuestionCategory>>, t: Throwable) {
-                categoriesLoad.value = false
-                categoriesError.value = true
+                _categoriesLoad.value = false
+                _categoriesError.value = true
                 Log.e("RetrofitError", t.message.toString())
             }
         })
     }
 
     fun getCategoryQuestions(categoryId: Int, amount: Int = 10) {
-        questionsLoad.value = true
+        _questionsLoad.value = true
 
         questionAPI.getQuestions(categoryId = categoryId, amount = amount).enqueue(object : Callback<List<Question>> {
             override fun onResponse(call: Call<List<Question>>, response: Response<List<Question>>) {
                 if (response.isSuccessful) {
-                    questionsData.value = response.body()
-                    questionsError.value = false
+                    _questionsData.value = response.body() ?: emptyList()
+                    _questionsError.value = false
                 } else {
-                    questionsError.value = true
+                    _questionsError.value = true
                 }
-                questionsLoad.value = false
+                _questionsLoad.value = false
             }
 
             override fun onFailure(call: Call<List<Question>>, t: Throwable) {
-                questionsLoad.value = false
-                questionsError.value = true
+                _questionsLoad.value = false
+                _questionsError.value = true
                 Log.e("RetrofitError", t.message.toString())
             }
         })
     }
+
 }

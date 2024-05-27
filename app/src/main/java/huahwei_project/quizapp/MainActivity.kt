@@ -3,18 +3,26 @@ package huahwei_project.quizapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.collectAsState
 import huahwei_project.quizapp.ui.theme.QuizAppTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.Dp
+import androidx.compose.runtime.getValue
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,25 +66,25 @@ fun MainScreen() {
 
 @Composable
 fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit) {
-    val categoriesData by viewModel.categoriesData.collectAsStateWithLifecycle(emptyList())
-    val categoriesLoad by viewModel.categoriesLoad.collectAsStateWithLifecycle(initial = false)
-    val categoriesError by viewModel.categoriesError.collectAsStateWithLifecycle(initial = false)
+    val categoriesData: List<QuestionCategory> by viewModel.categoriesData.collectAsState(emptyList())
+    val categoriesLoad: Boolean by viewModel.categoriesLoad.collectAsState(false)
+    val categoriesError: Boolean by viewModel.categoriesError.collectAsState(false)
 
     when {
         categoriesLoad -> {
-            Text(text = "Loading categories...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+            Text(text = "Loading categories...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
         }
         categoriesError -> {
-            Text(text = "Error loading categories", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+            Text(text = "Error loading categories", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
         }
         else -> {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(categoriesData) { category ->
                     Text(
                         text = category.name,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(Dp(16.toFloat()))
                             .clickable { onCategorySelected(category.id) }
                     )
                 }
@@ -88,27 +96,26 @@ fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit
 @Composable
 fun QuestionsOfCategoryScreen(viewModel: MainViewModel, categoryId: Int) {
     LaunchedEffect(categoryId) {
-        viewModel.getQuestionsForCategory(categoryId)
+        viewModel.getCategoryQuestions(categoryId)
     }
-
-    val questionsData by viewModel.questionsData.collectAsStateWithLifecycle(emptyList())
-    val questionsLoad by viewModel.questionsLoad.collectAsStateWithLifecycle(initial = false)
-    val questionsError by viewModel.questionsError.collectAsStateWithLifecycle(initial = false)
+    val questionsData: List<Question> by viewModel.questionsData.collectAsState(emptyList())
+    val questionsLoad: Boolean by viewModel.questionsLoad.collectAsState(false)
+    val questionsError: Boolean by viewModel.questionsError.collectAsState(false)
 
     when {
         questionsLoad -> {
-            Text(text = "Loading questions...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+            Text(text = "Loading questions...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
         }
         questionsError -> {
-            Text(text = "Error loading questions", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+            Text(text = "Error loading questions", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
         }
         else -> {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(questionsData) { question ->
                     Text(
                         text = question.question,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(16.dp)
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(Dp(16.toFloat()))
                     )
                 }
             }
