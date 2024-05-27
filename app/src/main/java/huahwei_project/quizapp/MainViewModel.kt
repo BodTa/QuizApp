@@ -16,6 +16,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val categoriesLoad = MutableLiveData<Boolean>()
     val categoriesError = MutableLiveData<Boolean>()
 
+    val questionsData = MutableLiveData<List<Question>>()
+    val questionsLoad = MutableLiveData<Boolean>()
+    val questionsError = MutableLiveData<Boolean>()
+
     init {
         getCategoriesFromAPI()
     }
@@ -37,6 +41,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             override fun onFailure(call: Call<List<QuestionCategory>>, t: Throwable) {
                 categoriesLoad.value = false
                 categoriesError.value = true
+                Log.e("RetrofitError", t.message.toString())
+            }
+        })
+    }
+
+    fun getCategoryQuestions(categoryId: Int, amount: Int = 10) {
+        questionsLoad.value = true
+
+        questionAPI.getQuestions(categoryId = categoryId, amount = amount).enqueue(object : Callback<List<Question>> {
+            override fun onResponse(call: Call<List<Question>>, response: Response<List<Question>>) {
+                if (response.isSuccessful) {
+                    questionsData.value = response.body()
+                    questionsError.value = false
+                } else {
+                    questionsError.value = true
+                }
+                questionsLoad.value = false
+            }
+
+            override fun onFailure(call: Call<List<Question>>, t: Throwable) {
+                questionsLoad.value = false
+                questionsError.value = true
                 Log.e("RetrofitError", t.message.toString())
             }
         })
