@@ -3,34 +3,29 @@ package huahwei_project.quizapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import huahwei_project.quizapp.ui.theme.QuizAppTheme
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: MainViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
         setContent {
             QuizAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CategoryListScreen(viewModel = viewModel)
+                    MainScreen()
                 }
             }
         }
@@ -38,45 +33,85 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CategoryListScreen(viewModel: MainViewModel) {
+fun MainScreen() {
+    val navController = rememberNavController()
+    val mainViewModel: MainViewModel = viewModel()
+
+    NavHost(navController = navController, startDestination = "categories") {
+        composable("categories") {
+            CategoriesScreen(
+                viewModel = mainViewModel,
+                onCategorySelected = { categoryId ->
+                    navController.navigate("questions/$categoryId")
+                }
+            )
+        }
+        composable("questions/{categoryId}") { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString("categoryId")?.toInt() ?: 0
+            QuestionsOfCategoryScreen(
+                viewModel = mainViewModel,
+                categoryId = categoryId
+            )
+        }
+    }
+}
+
+@Composable
+fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit) {
     val categoriesData by viewModel.categoriesData.collectAsStateWithLifecycle(emptyList())
     val categoriesLoad by viewModel.categoriesLoad.collectAsStateWithLifecycle(initial = false)
     val categoriesError by viewModel.categoriesError.collectAsStateWithLifecycle(initial = false)
 
     when {
         categoriesLoad -> {
-            Text(text = "Loading...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+            Text(text = "Loading categories...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
         }
         categoriesError -> {
             Text(text = "Error loading categories", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
         }
         else -> {
-            CategoryList(categories = categoriesData)
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(categoriesData) { category ->
+                    Text(
+                        text = category.name,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable { onCategorySelected(category.id) }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun CategoryList(categories: List<QuestionCategory>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(categories) { category ->
-            Text(
-                text = category.name,
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+fun QuestionsOfCategoryScreen(viewModel: MainViewModel, categoryId: Int) {
+    LaunchedEffect(categoryId) {
+        viewModel.getQuestionsForCategory(categoryId)
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    QuizAppTheme {
-        CategoryList(categories = listOf(
-            QuestionCategory(id = 9, name = "General Knowledge"),
-            QuestionCategory(id = 10, name = "Entertainment: Books"),
-            QuestionCategory(id = 11, name = "Entertainment: Film")
-        ))
+    val questionsData by viewModel.questionsData.collectAsStateWithLifecycle(emptyList())
+    val questionsLoad by viewModel.questionsLoad.collectAsStateWithLifecycle(initial = false)
+    val questionsError by viewModel.questionsError.collectAsStateWithLifecycle(initial = false)
+
+    when {
+        questionsLoad -> {
+            Text(text = "Loading questions...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+        }
+        questionsError -> {
+            Text(text = "Error loading questions", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.h6)
+        }
+        else -> {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(questionsData) { question ->
+                    Text(
+                        text = question.question,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
     }
 }
