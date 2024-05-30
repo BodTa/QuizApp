@@ -40,8 +40,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getCategoriesFromAPI() {
         _categoriesLoad.value = true
 
-        questionAPI.getCategories().enqueue(object : Callback<CategoryList> {
-            override fun onResponse(call: Call<CategoryList>, response: Response<CategoryList>) {
+        questionAPI.getCategories().enqueue(object : Callback<QuestionCategoryResponse> {
+            override fun onResponse(call: Call<QuestionCategoryResponse>, response: Response<QuestionCategoryResponse>) {
                 if (response.isSuccessful) {
                     println(response.body()?.trivia_categories)
                     _categoriesData.value = response.body()?.trivia_categories ?: emptyList()
@@ -52,7 +52,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _categoriesLoad.value = false
             }
 
-            override fun onFailure(call: Call<CategoryList>, t: Throwable) {
+            override fun onFailure(call: Call<QuestionCategoryResponse>, t: Throwable) {
                 _categoriesLoad.value = false
                 _categoriesError.value = true
                 Log.e("RetrofitError", t.message.toString())

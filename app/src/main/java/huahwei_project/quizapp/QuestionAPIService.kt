@@ -17,7 +17,7 @@ class QuestionAPIService {
         return api.getQuestions(amount, categoryId)
     }
 
-    fun getCategories(): Call<CategoryList> {
+    fun getCategories(): Call<QuestionCategoryResponse> {
         return api.getCategories()
     }
 }

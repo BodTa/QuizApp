@@ -12,5 +12,5 @@ interface QuestionAPI {
     ): Call<QuestionResponse>
 
     @GET("api_category.php")
-    fun getCategories():Call<CategoryList>
+    fun getCategories():Call<QuestionCategoryResponse>
 }
