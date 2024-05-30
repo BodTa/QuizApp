@@ -33,6 +33,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _questionsError = MutableStateFlow<Boolean>(false)
     val questionsError: StateFlow<Boolean> = _questionsError
 
+    private val _currentQuestionIndex = MutableStateFlow(0)
+    val currentQuestionIndex: StateFlow<Int> get() = _currentQuestionIndex
+
+    private val _score = MutableStateFlow(0)
+    val score: StateFlow<Int> get() = _score
+
     init {
         getCategoriesFromAPI()
     }
@@ -69,6 +75,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.isSuccessful) {
                     _questionsData.value = response.body()?.results ?: emptyList()
                     _questionsError.value = false
+                    _currentQuestionIndex.value = 0
+                    _score.value = 0
                 } else {
                     _questionsError.value = true
                 }
@@ -81,6 +89,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e("RetrofitError", t.message.toString())
             }
         })
+    }
+    fun incrementQuestionIndex() {
+        _currentQuestionIndex.value += 1
+    }
+
+    fun addScore() {
+        _score.value += 1
     }
 
 }
