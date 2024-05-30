@@ -4,10 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -22,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +52,14 @@ fun MainScreen() {
     val navController = rememberNavController()
     val mainViewModel: MainViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "categories") {
+    NavHost(navController = navController, startDestination = "home") {
+
+        composable("home"){
+            HomeScreen(onNavigateToCategories = {
+                navController.navigate("categories")
+            })
+        }
+
         composable("categories") {
             CategoriesScreen(
                 viewModel = mainViewModel,
@@ -64,6 +78,24 @@ fun MainScreen() {
     }
 }
 
+@Composable
+fun HomeScreen(onNavigateToCategories:()->Unit){
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Quiz App", style = MaterialTheme.typography.headlineLarge)
+            Spacer(modifier = Modifier.height(Dp(16.toFloat())))
+            Button(onClick = onNavigateToCategories) {
+                Text(text = "Start Quiz")
+            }
+        }
+    }
+}
 @Composable
 fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit) {
     val categoriesData: List<QuestionCategory> by viewModel.categoriesData.collectAsState(emptyList())
