@@ -6,11 +6,11 @@ import retrofit2.http.Query
 
 interface QuestionAPI {
     @GET("api.php")
-    fun GetQuestions(
+    fun getQuestions(
         @Query("amount") amount: Int = 10,
         @Query("categoryId") categoryId: Int
     ): Call<List<Question>>
 
     @GET("api_category.php")
-    fun GetCategories():Call<List<QuestionCategory>>
+    fun getCategories():Call<CategoryList>
 }

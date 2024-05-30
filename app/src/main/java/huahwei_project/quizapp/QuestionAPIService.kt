@@ -14,10 +14,10 @@ class QuestionAPIService {
         .create(QuestionAPI::class.java)
 
     fun getQuestions(amount: Int, categoryId: Int): Call<List<Question>> {
-        return api.GetQuestions(amount, categoryId)
+        return api.getQuestions(amount, categoryId)
     }
 
-    fun getCategories(): Call<List<QuestionCategory>> {
-        return api.GetCategories()
+    fun getCategories(): Call<CategoryList> {
+        return api.getCategories()
     }
 }
