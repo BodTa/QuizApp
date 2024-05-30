@@ -63,11 +63,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getCategoryQuestions(categoryId: Int, amount: Int = 10) {
         _questionsLoad.value = true
 
-        questionAPI.getQuestions(categoryId = categoryId, amount = amount).enqueue(object : Callback<List<Question>> {
-            override fun onResponse(call: Call<List<Question>>, response: Response<List<Question>>) {
+        questionAPI.getQuestions(categoryId = categoryId, amount = amount).enqueue(object : Callback<QuestionResponse> {
+            override fun onResponse(call: Call<QuestionResponse>, response: Response<QuestionResponse>) {
                 println(response)
                 if (response.isSuccessful) {
-                    _questionsData.value = response.body() ?: emptyList()
+                    _questionsData.value = response.body()?.results ?: emptyList()
                     _questionsError.value = false
                 } else {
                     _questionsError.value = true
@@ -75,7 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _questionsLoad.value = false
             }
 
-            override fun onFailure(call: Call<List<Question>>, t: Throwable) {
+            override fun onFailure(call: Call<QuestionResponse>, t: Throwable) {
                 _questionsLoad.value = false
                 _questionsError.value = true
                 Log.e("RetrofitError", t.message.toString())

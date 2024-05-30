@@ -9,7 +9,7 @@ interface QuestionAPI {
     fun getQuestions(
         @Query("amount") amount: Int = 10,
         @Query("categoryId") categoryId: Int
-    ): Call<List<Question>>
+    ): Call<QuestionResponse>
 
     @GET("api_category.php")
     fun getCategories():Call<CategoryList>

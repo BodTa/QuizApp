@@ -13,7 +13,7 @@ class QuestionAPIService {
         .build()
         .create(QuestionAPI::class.java)
 
-    fun getQuestions(amount: Int, categoryId: Int): Call<List<Question>> {
+    fun getQuestions(amount: Int, categoryId: Int): Call<QuestionResponse> {
         return api.getQuestions(amount, categoryId)
     }
 
