@@ -161,33 +161,40 @@ fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit
     val categoriesData: List<QuestionCategory> by viewModel.categoriesData.collectAsState(emptyList())
     val categoriesLoad: Boolean by viewModel.categoriesLoad.collectAsState(false)
     val categoriesError: Boolean by viewModel.categoriesError.collectAsState(false)
-
-    when {
-        categoriesLoad -> {
-            Text(text = "Loading categories...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
-        }
-        categoriesError -> {
-            Text(text = "Error loading categories", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
-        }
-        else -> {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(categoriesData) { category ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(Dp(8.toFloat()))
-                            .clickable { onCategorySelected(category.id) },
-                    ) {
-                        Text(
-                            text = category.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(
+            text = "Select a Category",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        when {
+            categoriesLoad -> {
+                Text(text = "Loading categories...", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
+            }
+            categoriesError -> {
+                Text(text = "Error loading categories", modifier = Modifier.fillMaxSize(), style = MaterialTheme.typography.headlineMedium)
+            }
+            else -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(categoriesData) { category ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(Dp(8.toFloat()))
+                                .clickable { onCategorySelected(category.id) },
+                        ) {
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 @Composable
