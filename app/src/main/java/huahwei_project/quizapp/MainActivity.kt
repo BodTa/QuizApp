@@ -15,6 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -65,24 +71,27 @@ fun MainScreen() {
     NavHost(navController = navController, startDestination = "home") {
 
         composable("home"){
-            HomeScreen(onNavigateToCategories = {
-                navController.navigate("categories")
+            HomeScreen(onNavigateToCategories = {amount->
+                navController.navigate("categories/$amount")
             })
         }
 
-        composable("categories") {
+        composable("categories/{amount}") {backStackEntry->
+            val amount = backStackEntry.arguments?.getString("amount")?.toInt() ?:10
             CategoriesScreen(
                 viewModel = mainViewModel,
                 onCategorySelected = { categoryId ->
-                    navController.navigate("questions/$categoryId")
+                    navController.navigate("questions/$categoryId/$amount")
                 }
             )
         }
-        composable("questions/{categoryId}") { backStackEntry ->
+        composable("questions/{categoryId}/{amount}") { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")?.toInt() ?: 0
+            val amount = backStackEntry.arguments?.getString("amount")?.toInt() ?:10
             QuizScreen(
                 viewModel = mainViewModel,
                 categoryId = categoryId,
+                questionAmount = amount,
                 onQuizEnd = { score ->
                     navController.navigate("result/$score")
                 }
@@ -100,19 +109,49 @@ fun MainScreen() {
 }
 
 @Composable
-fun HomeScreen(onNavigateToCategories:()->Unit){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+fun HomeScreen(onNavigateToCategories:(amount:Int)->Unit){
+    var selectedAmount by remember {
+        (mutableStateOf(10))
+    }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Text("Quiz App", color=Color.Magenta,style=MaterialTheme.typography.headlineLarge)
+        QuestionAmountSelector(selectedAmount) { amount ->
+            selectedAmount = amount
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { onNavigateToCategories(selectedAmount) }) {
+            Text("Go to Categories")
+        }
+    }
+}
+
+@Composable
+fun QuestionAmountSelector(selectedAmount: Int, onAmountSelected: (Int) -> Unit) {
+    val questionAmounts = listOf(10, 20, 30, 40, 50)
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.padding(8.dp)) {
+        TextButton(onClick = { expanded = true }) {
+            Text("Questions: $selectedAmount", color = Color.Black)
+            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
         ) {
-            Text(text = "Quiz App", style = MaterialTheme.typography.headlineLarge)
-            Spacer(modifier = Modifier.height(Dp(16.toFloat())))
-            Button(onClick = onNavigateToCategories) {
-                Text(text = "Start Quiz")
+            questionAmounts.forEach { amount ->
+                DropdownMenuItem(onClick = {
+                    expanded = false
+                    onAmountSelected(amount)
+                }) {
+                    Text("Questions: $amount")
+                }
             }
         }
     }
@@ -152,9 +191,9 @@ fun CategoriesScreen(viewModel: MainViewModel, onCategorySelected: (Int) -> Unit
 }
 
 @Composable
-fun QuizScreen(viewModel: MainViewModel, categoryId: Int,onQuizEnd: (Int) -> Unit) {
+fun QuizScreen(viewModel: MainViewModel, categoryId: Int,questionAmount:Int,onQuizEnd: (Int) -> Unit) {
     LaunchedEffect(categoryId) {
-        viewModel.getCategoryQuestions(categoryId)
+        viewModel.getCategoryQuestions(categoryId,questionAmount)
     }
     val questions by viewModel.questionsData.collectAsState()
     val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
